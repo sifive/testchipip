@@ -158,13 +158,13 @@ trait CanHaveTraceIO { this: HasTiles =>
   val module: CanHaveTraceIOModuleImp
 
   // Bind all the trace nodes to a BB; we'll use this to generate the IO in the imp
-  val traceNexus = BundleBridgeNexus[Vec[TracedInstruction]]
+  val traceNexus = BundleBridgeNexus[Vec[TracedInstruction]]()
   val tileTraceNodes = tiles.flatMap {
     case ext_tile: WithExtendedTraceport => None
     case tile => Some(tile)
   }.map { _.traceNode }
 
-  val extTraceNexus = BundleBridgeNexus[Vec[ExtendedTracedInstruction]]
+  val extTraceNexus = BundleBridgeNexus[Vec[ExtendedTracedInstruction]]()
   val extTileTraceNodes = tiles.flatMap {
     case ext_tile: WithExtendedTraceport => Some(ext_tile)
     case tile => None
