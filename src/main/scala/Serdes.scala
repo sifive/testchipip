@@ -506,7 +506,8 @@ class TLSerdes(w: Int, params: Seq[TLManagerParameters], beatBytes: Int = 8, has
 
   val node = TLManagerNode(params.map(manager => TLSlavePortParameters.v1(managers = Seq(manager), beatBytes = beatBytes)))
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val nChannels = params.size
     val io        = IO(new Bundle {
       val ser = Vec(nChannels, new SerialIO(w))
@@ -545,7 +546,8 @@ class TLDesser(w: Int, params: Seq[TLClientParameters], hasCorruptDenied: Boolea
 
   val node = TLClientNode(params.map(client => TLMasterPortParameters.v1(Seq(client))))
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val nChannels = params.size
     val io        = IO(new Bundle {
       val ser = Vec(nChannels, new SerialIO(w))
@@ -596,7 +598,8 @@ class TLSerdesser(
   val clientNode  = TLClientNode(Seq(clientPortParams))
   val managerNode = TLManagerNode(Seq(managerPortParams))
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val io = IO(new TLSerdesserModuleIO(w))
 
     val (client_tl, client_edge)   = clientNode.out(0)

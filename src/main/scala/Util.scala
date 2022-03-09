@@ -185,7 +185,8 @@ class ClockedAndResetIO[T <: Data](private val gen: T) extends Bundle {
 
 class TLSinkSetter(endSinkId: Int)(implicit p: Parameters) extends LazyModule {
   val node = TLAdapterNode(managerFn = { m => m.v1copy(endSinkId = endSinkId) })
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     // FIXME: bulk connect
     def connect[T <: TLBundleBase](out: DecoupledIO[T], in: DecoupledIO[T]) {
       out.valid := in.valid
@@ -221,7 +222,8 @@ object TLSinkSetter {
 
 class TLSourceSetter(sourceId: Int)(implicit p: Parameters) extends LazyModule {
   val node = TLAdapterNode(clientFn = { cp => cp.v1copy(clients = cp.clients.map { c => c.v1copy(sourceId = IdRange(0, sourceId))} )})
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     // FIXME: bulk connect
     def connect[T <: TLBundleBase](out: DecoupledIO[T], in: DecoupledIO[T]) {
       out.valid := in.valid

@@ -36,7 +36,8 @@ class TLTileResetCtrl(w: Int, params: TileResetCtrlParams, tile_prci_domains: Se
   val tileResetProviderNode = ClockGroupIdentityNode()
   val asyncResetSinkNode = ClockSinkNode(Seq(ClockSinkParameters()))
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val nTiles = p(TilesLocated(InSubsystem)).size
     require (nTiles <= 4096 / 4)
     val r_tile_resets = (0 until nTiles).map({ i =>

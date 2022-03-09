@@ -139,7 +139,8 @@ class TLRingNetwork(
         })
     })
 
-  lazy val module = new LazyModuleImp(this) with HasTLNetwork {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) with HasTLNetwork {
     val (io_in, edgesIn) = node.in.unzip
     val (io_out, edgesOut) = node.out.unzip
     val nIn = edgesIn.size
