@@ -16,7 +16,8 @@ class BlockDeviceTrackerTestDriver(nSectors: Int)(implicit p: Parameters)
   val node = TLHelper.makeClientNode(
     name = "blkdev-testdriver", sourceId = IdRange(0, 1))
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val io = IO(new Bundle {
       val start = Input(Bool())
       val finished = Output(Bool())
@@ -103,7 +104,8 @@ class BlockDeviceTrackerTest(implicit p: Parameters) extends LazyModule
   testram.node := TLBuffer() := TLFragmenter(beatBytes, dataBytes) := xbar.node
   testrom.node := TLBuffer() := TLFragmenter(beatBytes, dataBytes) := xbar.node
 
-  lazy val module = new LazyModuleImp(this) with HasUnitTestIO {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) with HasUnitTestIO {
     val io = IO(new Bundle with UnitTestIO)
     val blkdev = Module(new BlockDeviceModel(nSectors))
     blkdev.io <> tracker.module.io.bdev
@@ -135,7 +137,7 @@ class SerdesTest(implicit p: Parameters) extends LazyModule {
 
   val serdes = LazyModule(new TLSerdes(
     w = serWidth,
-    params = Seq(TLManagerParameters(
+    params = Seq(TLSlaveParameters.v1(
       address = Seq(AddressSet(0, 0xffff)),
       regionType = RegionType.UNCACHED,
       supportsGet = TransferSizes(1, lineBytes),
@@ -144,7 +146,7 @@ class SerdesTest(implicit p: Parameters) extends LazyModule {
 
   val desser = LazyModule(new TLDesser(
     w = serWidth,
-    params = Seq(TLClientParameters(
+    params = Seq(TLMasterParameters.v1(
       name = "tl-desser",
       sourceId = IdRange(0, 1 << idBits)))))
 
@@ -156,7 +158,8 @@ class SerdesTest(implicit p: Parameters) extends LazyModule {
   testram.node := TLBuffer() :=
     TLFragmenter(beatBytes, lineBytes) := desser.node
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val io = IO(new Bundle { val finished = Output(Bool()) })
 
     val mergeType = serdes.module.mergeTypes(0)
@@ -191,15 +194,21 @@ class BidirectionalSerdesTest(implicit p: Parameters) extends LazyModule {
 
   val serdes = LazyModule(new TLSerdesser(
     w = serWidth,
-    clientParams = TLClientParameters(
-      name = "tl-desser",
-      sourceId = IdRange(0, 1 << idBits)),
-    managerParams = TLManagerParameters(
-      address = Seq(AddressSet(0, 0xffff)),
-      regionType = RegionType.UNCACHED,
-      supportsGet = TransferSizes(1, lineBytes),
-      supportsPutFull = TransferSizes(1, lineBytes)),
-    beatBytes = beatBytes))
+    clientPortParams = TLMasterPortParameters.v1(
+      clients = Seq(TLMasterParameters.v1(
+        name = "tl-desser",
+        sourceId = IdRange(0, 1 << idBits)))
+    ),
+    managerPortParams = TLSlavePortParameters.v1(
+      managers = Seq(TLSlaveParameters.v1(
+        address = Seq(AddressSet(0, 0xffff)),
+        regionType = RegionType.UNCACHED,
+        supportsGet = TransferSizes(1, lineBytes),
+        supportsPutFull = TransferSizes(1, lineBytes))
+      ),
+      beatBytes = 8
+    )
+  ))
 
   val testram = LazyModule(new TLTestRAM(
     address = AddressSet(0, 0xffff),
@@ -209,7 +218,8 @@ class BidirectionalSerdesTest(implicit p: Parameters) extends LazyModule {
   testram.node := TLBuffer() :=
     TLFragmenter(beatBytes, lineBytes) := serdes.clientNode
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val io = IO(new Bundle { val finished = Output(Bool()) })
 
     val mergeType = serdes.module.mergeType
@@ -280,7 +290,8 @@ class StreamWidthAdapterTest extends UnitTest {
 class SwitcherDummy(implicit p: Parameters) extends LazyModule {
   val node = TLHelper.makeClientNode("dummy", IdRange(0, 1))
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val (tl, edge) = node.out(0)
 
     tl.a.valid := false.B
@@ -340,7 +351,8 @@ class SwitcherTest(implicit p: Parameters) extends LazyModule {
     TLFragmenter(beatBytes, lineBytes) :=
     switcher.outnodes(1))
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val io = IO(new Bundle with UnitTestIO)
 
     io.finished := fuzzers.map(_.module.io.finished).reduce(_ && _)
@@ -375,7 +387,8 @@ class TLRingNetworkTest(implicit p: Parameters) extends LazyModule {
   fuzzers.foreach(ring.node := _.node)
   rams.foreach(_.node := TLFragmenter(beatBytes, blockBytes) := ring.node)
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val io = IO(new Bundle with UnitTestIO)
 
     io.finished := fuzzers.map(_.module.io.finished).reduce(_ && _)
@@ -492,11 +505,14 @@ class NetworkXbarTest extends UnitTest {
 object TestChipUnitTests {
   def apply(implicit p: Parameters): Seq[UnitTest] =
     Seq(
+      Module(new TSIHostWidgetBackendTestWrapper),
+      //Module(new TSIHostWidgetTestWrapper),
       Module(new BlockDeviceTrackerTestWrapper),
       Module(new SerdesTestWrapper),
       Module(new BidirectionalSerdesTestWrapper),
       Module(new SwitchTestWrapper),
       Module(new StreamWidthAdapterTest),
       Module(new NetworkXbarTest),
-      Module(new TLRingNetworkTestWrapper))
+      Module(new TLRingNetworkTestWrapper)
+    )
 }

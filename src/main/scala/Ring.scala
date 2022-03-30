@@ -18,16 +18,12 @@ class RingInputNodeIO[T <: Data](bundleType: NetworkBundle[T])
     extends RingInternalIO(bundleType) {
   val ext_in = Flipped(Decoupled(bundleType))
 
-  override def cloneType =
-    new RingInputNodeIO(bundleType).asInstanceOf[this.type]
 }
 
 class RingOutputNodeIO[T <: Data](bundleType: NetworkBundle[T])
     extends RingInternalIO(bundleType) {
   val ext_out = Decoupled(bundleType)
 
-  override def cloneType =
-    new RingOutputNodeIO(bundleType).asInstanceOf[this.type]
 }
 
 class RingInputNode[T <: Data](
@@ -120,30 +116,31 @@ class TLRingNetwork(
 
   val node = TLNexusNode(
     clientFn  = { seq =>
-      seq(0).copy(
+      seq(0).v1copy(
         minLatency = seq.map(_.minLatency).min,
         clients = (TLXbar.mapInputIds(seq) zip seq) flatMap { case (range, port) =>
-          port.clients map { client => client.copy(
+          port.clients map { client => client.v1copy(
             sourceId = client.sourceId.shift(range.start)
           )}
         })
     },
     managerFn = { seq =>
       val fifoIdFactory = TLXbar.relabeler()
-      seq(0).copy(
+      seq(0).v1copy(
         minLatency = seq.map(_.minLatency).min,
         endSinkId = TLXbar.mapOutputIds(seq).map(_.end).max,
         managers = seq.flatMap { port =>
           require (port.beatBytes == seq(0).beatBytes,
             s"Ring data widths don't match: ${port.managers.map(_.name)} has ${port.beatBytes}B vs ${seq(0).managers.map(_.name)} has ${seq(0).beatBytes}B")
           val fifoIdMapper = fifoIdFactory()
-          port.managers map { manager => manager.copy(
+          port.managers map { manager => manager.v1copy(
             fifoId = manager.fifoId.map(fifoIdMapper(_))
           )}
         })
     })
 
-  lazy val module = new LazyModuleImp(this) with HasTLNetwork {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) with HasTLNetwork {
     val (io_in, edgesIn) = node.in.unzip
     val (io_out, edgesOut) = node.out.unzip
     val nIn = edgesIn.size

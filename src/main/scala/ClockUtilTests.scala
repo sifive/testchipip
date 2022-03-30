@@ -2,8 +2,7 @@ package testchipip
 
 import chisel3._
 import chisel3.util._
-import chisel3.experimental.{withClock, withClockAndReset}
-import chisel3.core.IntParam
+import chisel3.experimental.IntParam
 import freechips.rocketchip.unittest._
 import freechips.rocketchip.util.{ResetCatchAndSync, EICG_wrapper}
 
@@ -23,12 +22,12 @@ class ClockMutexMuxTest(timeout: Int = 200000) extends UnitTest(timeout) {
     minMonitor.io.clock := mux.io.clockOut
     minMonitor.io.enable := true.B
 
-    val syncReset = ResetCatchAndSync(clocks(0), this.reset.toBool)
+    val syncReset = ResetCatchAndSync(clocks(0), this.reset.asBool)
 
     val state = withClockAndReset(clocks(0), syncReset) { RegInit(sReset) }
 
     withClock(mux.io.clockOut) {
-        assert(!this.reset.toBool, "Should not get any clock edges while in reset")
+        assert(!this.reset.asBool, "Should not get any clock edges while in reset")
     }
 
     withClockAndReset(clocks(0), syncReset) {
@@ -68,7 +67,7 @@ class ClockDividerTest(timeout: Int = 200000) extends UnitTest(timeout) {
     val myClock = Module(new ClockGenerator(base)).io.clock
     val monitors = divs.map(x => if (x == 0) 0 else (x + 1)*base).map(x => Module(new PeriodMonitor(x, Some(x))))
 
-    val syncReset = ResetCatchAndSync(myClock, this.reset.toBool)
+    val syncReset = ResetCatchAndSync(myClock, this.reset.asBool)
 
     val divider = withClock(myClock) { Module(new ClockDivider(log2Ceil(divs.max))) }
 

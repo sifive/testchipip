@@ -5,7 +5,7 @@ import chisel3.util._
 
 import freechips.rocketchip.subsystem.{BaseSubsystem, HasTiles}
 import freechips.rocketchip.config.{Field, Config, Parameters}
-import freechips.rocketchip.diplomacy.{LazyModule, AddressSet, LazyModuleImp}
+import freechips.rocketchip.diplomacy.{LazyModule, AddressSet, LazyModuleImpLike}
 import freechips.rocketchip.tilelink.{TLRAM}
 import freechips.rocketchip.rocket.{TracedInstruction}
 import freechips.rocketchip.util._
@@ -175,8 +175,9 @@ trait CanHaveTraceIO { this: HasTiles =>
   extTileTraceNodes.foreach { extTraceNexus := _ }
 }
 
-trait CanHaveTraceIOModuleImp extends LazyModuleImp {
+trait CanHaveTraceIOModuleImp { this: LazyModuleImpLike =>
   val outer: CanHaveTraceIO with HasTiles
+  implicit val p: Parameters
 
   val traceIO = p(TracePortKey) map ( traceParams => {
     val extTraceSeqVec = (outer.traceNexus.in.map(_._1)).map(ExtendedTracedInstruction.fromVec(_)) ++ outer.extTraceNexus.in.map(_._1)
@@ -186,9 +187,9 @@ trait CanHaveTraceIOModuleImp extends LazyModuleImp {
       (outer.extTraceNexus.in) .map { case (tileTrace, _) => DeclockedTracedInstruction.fromExtVec(tileTrace) })
 
     // Since clock & reset are not included with the traced instruction, plumb that out manually
-    (tio.traces zip (outer.tiles zip tileInsts)).foreach { case (port, (tile, insts)) =>
-      port.clock := tile.module.clock
-      port.reset := tile.module.reset.asBool
+    (tio.traces zip (outer.tile_prci_domains zip tileInsts)).foreach { case (port, (prci, insts)) =>
+      port.clock := prci.module.clock
+      port.reset := prci.module.reset.asBool
       port.insns := insts
     }
 

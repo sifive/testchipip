@@ -3,6 +3,7 @@ package testchipip
 import chisel3._
 import chisel3.util._
 import chisel3.experimental.{IntParam, StringParam}
+import freechips.rocketchip.subsystem.{InSubsystem}
 import freechips.rocketchip.config.{Parameters}
 import freechips.rocketchip.util.{UIntToAugmentedUInt, ElaborationArtefacts}
 import freechips.rocketchip.subsystem.{ExtMem, HierarchicalLocation}

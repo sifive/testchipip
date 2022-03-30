@@ -104,8 +104,8 @@ class TLSwitcher(
   val device = new SimpleDevice("switcher", Seq("ucb-bar,switcher"))
 
   val innode = TLManagerNode(Seq.tabulate(inPortN) { i =>
-    TLManagerPortParameters(
-      Seq(TLManagerParameters(
+    TLSlavePortParameters.v1(
+      Seq(TLSlaveParameters.v1(
         address    = address(i),
         resources  = device.reg("mem"),
         regionType = if (cacheable) RegionType.UNCACHED
@@ -119,11 +119,12 @@ class TLSwitcher(
 
   val outnodes = outPortN.map(n =>
     TLClientNode(Seq.tabulate(n) { i =>
-      TLClientPortParameters(Seq(TLClientParameters(
+      TLMasterPortParameters.v1(Seq(TLMasterParameters.v1(
         name = s"switch_$i", sourceId = IdRange(0, 1 << idBits))))
     })): Seq[TLClientNode]
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val io = IO(new Bundle {
       val sel = Input(UInt(log2Ceil(outPortN.size).W))
     })

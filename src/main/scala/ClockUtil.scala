@@ -2,8 +2,7 @@ package testchipip
 
 import chisel3._
 import chisel3.util._
-import chisel3.core.IntParam
-import chisel3.experimental.{Analog}
+import chisel3.experimental.{Analog, IntParam}
 
 import freechips.rocketchip.config.Parameters
 import freechips.rocketchip.util.{AsyncResetSynchronizerShiftReg, ClockGate, ClockGateImpl}
@@ -84,13 +83,13 @@ class ClockMutexMux(val n: Int, depth: Int, genClockGate: () => ClockGate) exten
     val io = IO(new Bundle {
         val clocksIn = Input(Vec(n, Clock()))
         val clockOut = Output(Clock())
-        val resetAsync = Input(Bool())
+        val resetAsync = Input(AsyncReset())
         val sel = Input(UInt(log2Ceil(n).W))
     })
 
-    val andClocks = io.clocksIn.map(x => ClockSignalNor2(ClockInverter(x), io.resetAsync))
+    val andClocks = io.clocksIn.map(x => ClockSignalNor2(ClockInverter(x), io.resetAsync.asBool))
 
-    val syncs  = andClocks.map { c => withClockAndReset(c, io.resetAsync) { Module(new AsyncResetSynchronizerShiftReg(1, 3, 0)) } }
+    val syncs  = andClocks.map { c => withClockAndReset(c, io.resetAsync) { Module(new AsyncResetSynchronizerShiftReg(1, sync = depth, init = 0)) } }
     val gaters = andClocks.map { c =>
         val g = Module(genClockGate())
         g.io.in := c
@@ -100,7 +99,7 @@ class ClockMutexMux(val n: Int, depth: Int, genClockGate: () => ClockGate) exten
 
     syncs.zip(gaters).foreach { case (s, g) => g.io.en := s.io.q }
 
-    syncs.zipWithIndex.foreach { case (s, i) => s.io.d := (io.sel === i.U) && !(syncs.zipWithIndex.filter(_._2 != i).map(_._1.io.q.toBool).reduce(_||_)) }
+    syncs.zipWithIndex.foreach { case (s, i) => s.io.d := (io.sel === i.U) && !(syncs.zipWithIndex.filter(_._2 != i).map(_._1.io.q.asBool).reduce(_||_)) }
 
     io.clockOut := clockOrTree(gaters.map(_.io.out))(0)
 
@@ -162,6 +161,27 @@ class ClockDivider(width: Int) extends Module {
         count := count + 1.U
     }
 
+}
+
+// Performs clock division when divisor >= 1, as done in ClockDivider
+// When divisor is 0, pass through the clock
+class ClockDivideOrPass(width: Int, depth: Int = 3, genClockGate: () => ClockGate) extends Module {
+  val io = IO(new Bundle {
+    val divisor = Input(UInt(width.W))
+    val resetAsync = Input(AsyncReset())
+    val clockOut = Output(Clock())
+
+  })
+
+  val divider = Module(new ClockDivider(width))
+  divider.io.divisor := io.divisor
+
+  val clock_mux = Module(new ClockMutexMux(2, depth, genClockGate))
+  clock_mux.io.clocksIn(0) := divider.io.clockOut
+  clock_mux.io.clocksIn(1) := clock
+  clock_mux.io.sel := io.divisor === 0.U
+  clock_mux.io.resetAsync := io.resetAsync
+  io.clockOut := clock_mux.io.clockOut
 }
 
 object withGatedClock {

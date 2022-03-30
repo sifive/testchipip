@@ -6,16 +6,20 @@
 #include "mm_dramsim2.h"
 
 int dramsim = -1;
+unsigned long loadmem_addr = 0;
+std::string ini_dir = "dramsim2_ini";
+std::string loadmem_file = "";
 
 extern "C" void *memory_init(
         long long int mem_size,
         long long int word_size,
         long long int line_size,
-        long long int id_bits)
+        long long int id_bits,
+        long long int clock_hz
+			     )
 {
     mm_t *mm;
     s_vpi_vlog_info info;
-    std::string ini_dir = "dramsim2_ini";
 
     if (dramsim < 0) {
         if (!vpi_get_vlog_info(&info))
@@ -23,19 +27,27 @@ extern "C" void *memory_init(
 
         dramsim = 0;
         for (int i = 1; i < info.argc; i++) {
-            if (strcmp(info.argv[i], "+dramsim") == 0)
+            std::string arg(info.argv[i]);
+
+            if (arg == "+dramsim")
                 dramsim = 1;
-            if (std::string(info.argv[i]).find("+dramsim_ini_dir=") == 0)
-                ini_dir = info.argv[i] + strlen("+dramsim_ini_dir=");
+            if (arg.find("+dramsim_ini_dir=") == 0)
+                ini_dir = arg.substr(strlen("+dramsim_ini_dir="));
+            if (arg.find("+loadmem_addr=") == 0)
+                loadmem_addr = stol(arg.substr(strlen("+loadmem_addr=")), NULL, 16);
+            if (arg.find("+loadmem=") == 0)
+                loadmem_file = arg.substr(strlen("+loadmem="));
         }
     }
 
     if (dramsim)
-        mm = (mm_t *) (new mm_dramsim2_t(ini_dir, 1 << id_bits));
+        mm = (mm_t *) (new mm_dramsim2_t(ini_dir, 1 << id_bits, clock_hz));
     else
         mm = (mm_t *) (new mm_magic_t);
 
     mm->init(mem_size, word_size, line_size);
+    if (loadmem_file != "")
+        mm->load_mem(loadmem_addr, loadmem_file.c_str());
 
     return mm;
 }

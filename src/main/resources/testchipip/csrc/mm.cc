@@ -36,6 +36,11 @@ void mm_t::init(size_t sz, int wsz, int lsz)
   line_size = lsz;
   data = (uint8_t *) mmap(
           NULL, sz, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
+  if (data == MAP_FAILED) {
+    std::perror("[mm_t] mmap for backing storage failed");
+    exit(-1);
+  }
+
   size = sz;
 }
 
@@ -122,29 +127,31 @@ void mm_magic_t::tick(
   }
 }
 
-void load_mem(void** mems, const char* fn, int line_size, int nchannels)
+void mm_t::load_mem(unsigned long start, const char *fname)
 {
-  char* m;
-  ssize_t start = 0;
-  std::ifstream in(fn);
-  if (!in)
-  {
-    std::cerr << "could not open " << fn << std::endl;
-    exit(-1);
+  std::string line;
+  std::ifstream in(fname);
+  unsigned long fsize = 0;
+
+  if (!in.is_open()) {
+    fprintf(stderr, "Couldn't open loadmem file %s\n", fname);
+    abort();
   }
 
-  std::string line;
   while (std::getline(in, line))
   {
     #define parse_nibble(c) ((c) >= 'a' ? (c)-'a'+10 : (c)-'0')
     for (ssize_t i = line.length()-2, j = 0; i >= 0; i -= 2, j++) {
-      char data = (parse_nibble(line[i]) << 4) | parse_nibble(line[i+1]);
-      ssize_t addr = start + j;
-      int channel = (addr / line_size) % nchannels;
-      m = (char *) mems[channel];
-      addr = (addr / line_size / nchannels) * line_size + (addr % line_size);
-      m[addr] = data;
+      char byte = (parse_nibble(line[i]) << 4) | parse_nibble(line[i+1]);
+      ssize_t addr = (start + j) % size;
+      data[addr] = byte;
     }
     start += line.length()/2;
+    fsize += line.length()/2;
+
+    if (fsize > this->size) {
+      fprintf(stderr, "Loadmem file is too large\n");
+      abort();
+    }
   }
 }
