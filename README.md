@@ -1,3 +1,6 @@
+This is sifive's public fork of Testchipip. Changes required by parent repositiories should be made against the `sifive` branch. 
+
+
 # testchipip
 
 Useful IP components for chips.
