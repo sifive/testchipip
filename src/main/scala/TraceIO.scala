@@ -2,6 +2,7 @@ package testchipip
 
 import chisel3._
 import chisel3.util._
+import chisel3.experimental.hierarchy.{Instance, IsInstantiable}
 
 import freechips.rocketchip.subsystem.{BaseSubsystem, HasTiles}
 import freechips.rocketchip.config.{Field, Config, Parameters}
@@ -11,6 +12,8 @@ import freechips.rocketchip.rocket.{TracedInstruction}
 import freechips.rocketchip.util._
 import freechips.rocketchip.tile.{BaseTile}
 import freechips.rocketchip.diplomacy.{BundleBridgeSource, BundleBroadcast, BundleBridgeNexusNode}
+
+import scala.reflect.runtime.universe.TypeTag
 
 //***************************************************************************
 // Extended Trace Instruction Utilities:
@@ -159,16 +162,23 @@ trait CanHaveTraceIO { this: HasTiles =>
 
   // Bind all the trace nodes to a BB; we'll use this to generate the IO in the imp
   val traceNexus = BundleBridgeNexusNode[Vec[TracedInstruction]]()
-  val tileTraceNodes = tiles.flatMap {
-    case ext_tile: WithExtendedTraceport => None
-    case tile => Some(tile)
-  }.map { _.traceNode }
+
+  def isNonExtendedTracePortTile[T: TypeTag](tile: Instance[T]): Boolean = tile match {
+    case t if t.isA[WithExtendedTraceport] => false
+    case _ => true
+  }
+  val nonExtendedTracePortTiles = tiles.filter(t => isNonExtendedTracePortTile(t))
+
+  val tileTraceNodes = nonExtendedTracePortTiles.map { _.traceNode }
+
+  def isExtendedTracePortTile[T: TypeTag](tile: Instance[T]): Boolean = tile match {
+    case t if t.isA[WithExtendedTraceport] => true
+    case _ => false
+  }
+  val extendedTracePortTiles = tiles.filter(t => isExtendedTracePortTile(t))
 
   val extTraceNexus = BundleBridgeNexusNode[Vec[ExtendedTracedInstruction]]()
-  val extTileTraceNodes = tiles.flatMap {
-    case ext_tile: WithExtendedTraceport => Some(ext_tile)
-    case tile => None
-  }.map { _.extTraceNode }
+  val extTileTraceNodes = extendedTracePortTiles.map { _.asInstanceOf[WithExtendedTraceport].extTraceNode }
 
   // Convert all instructions to extended type
   tileTraceNodes.foreach { traceNexus := _ }
