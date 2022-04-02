@@ -566,7 +566,7 @@ class MultiClockSerialAXIRAM(
       port.clock := memClkRstSource.out.head._1.clock
       port.reset := memClkRstSource.out.head._1.reset
       port
-    })
+    }).toSeq
     ports
   }
 
