@@ -5,6 +5,7 @@ import chisel3.util._
 
 import freechips.rocketchip.config.Parameters
 import freechips.rocketchip.diplomacy._
+import freechips.rocketchip.diplomaticobjectmodel.logicaltree.LogicalTreeNode
 import freechips.rocketchip.subsystem.{SystemBus, SystemBusParams, HasTileLinkLocations}
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.util.{HellaPeekingArbiter, BooleanToAugmentedBoolean, Location}
@@ -201,7 +202,7 @@ case class RingSystemBusParams(
     buffer: TLNetworkBufferParams)
   extends TLBusWrapperInstantiationLike {
 
-  def instantiate(context: HasTileLinkLocations, loc: Location[TLBusWrapper])(implicit p: Parameters): SystemBus = {
+  def instantiate(context: HasTileLinkLocations, loc: Location[TLBusWrapper], parentLogicalTreeNode: Option[LogicalTreeNode] = None)(implicit p: Parameters): SystemBus = {
     val ring = LazyModule(new RingSystemBus(params, buffer))
     ring.suggestName(loc.name)
     context.tlBusWrapperLocationMap += (loc -> ring)
