@@ -50,7 +50,7 @@ class TLSwitchArbiter(n: Int, edge: TLEdge) extends Module {
     val a = Wire(Decoupled(new TLBundleA(params)))
     a.valid := in.a.valid
     a.bits := in.a.bits
-    a.bits.source := Cat(in.a.bits.source, i.U(log2Ceil(n).W))
+    a.bits.source := Cat(in.a.bits.source: UInt, i.U(log2Ceil(n).W))
     in.a.ready := a.ready
     a
   }
@@ -59,7 +59,7 @@ class TLSwitchArbiter(n: Int, edge: TLEdge) extends Module {
     val c = Wire(Decoupled(new TLBundleC(params)))
     c.valid := in.c.valid
     c.bits  := in.c.bits
-    c.bits.source := Cat(in.c.bits.source, i.U(log2Ceil(n).W))
+    c.bits.source := Cat(in.c.bits.source: UInt, i.U(log2Ceil(n).W))
     in.c.ready := c.ready
     c
   }

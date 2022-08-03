@@ -314,9 +314,9 @@ object TLMergedBundle {
     merged.data    := d.data
     if (hasCorruptDenied) {
       merged.corrupt.get := d.corrupt
-      merged.union       := Cat(d.sink, d.denied)
+      merged.union       := Cat(d.sink: UInt, d.denied)
     } else {
-      merged.union := Cat(d.sink, 0.U) //error
+      merged.union := Cat(d.sink: UInt, 0.U) //error
     }
     merged.last    := true.B
     merged
@@ -335,9 +335,9 @@ object TLMergedBundle {
     merged.data    := 0.U
     if (hasCorruptDenied) {
       merged.corrupt.get := DontCare
-      merged.union       := Cat(e.sink, false.B)
+      merged.union       := Cat(e.sink: UInt, false.B)
     } else {
-      merged.union := Cat(e.sink)
+      merged.union := Cat(e.sink: UInt)
     }
     merged.last    := true.B
     merged
