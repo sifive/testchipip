@@ -154,7 +154,7 @@ class BlockDeviceTrackerModule(outer: BlockDeviceTracker)
   io.bdev.req.bits := req
   io.bdev.req.bits.tag := 0.U
   io.bdev.data.valid := (state === s_bdev_write_data) && tl.d.valid
-  io.bdev.data.bits.data := tl.d.bits.data
+  io.bdev.data.bits.data := (tl.d.bits.data: UInt)
   io.bdev.data.bits.tag := 0.U
   tl.d.ready := (state === s_bdev_write_data && io.bdev.data.ready) ||
                 (state === s_mem_write_resp)
