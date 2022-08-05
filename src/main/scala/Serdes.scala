@@ -249,15 +249,15 @@ object TLMergedBundle {
   def apply(a: TLBundleA, params: TLBundleParameters, hasCorruptDenied: Boolean): TLMergedBundle = {
     val merged = Wire(new TLMergedBundle(params, hasCorruptDenied))
     merged.chanId        := TL_CHAN_ID_A
-    merged.opcode        := a.opcode
-    merged.param         := a.param
-    merged.size          := a.size
-    merged.source        := a.source
-    merged.address       := a.address
-    merged.data          := a.data
+    merged.opcode        := (a.opcode: UInt)
+    merged.param         := (a.param: UInt)
+    merged.size          := (a.size: UInt)
+    merged.source        := (a.source: UInt)
+    merged.address       := (a.address: UInt)
+    merged.data          := (a.data: UInt)
     if (hasCorruptDenied)
-      merged.corrupt.get := a.corrupt
-    merged.union         := a.mask
+      merged.corrupt.get := (a.corrupt: Bool)
+    merged.union         := (a.mask: UInt)
     merged.last          := true.B
     merged
   }
@@ -267,15 +267,15 @@ object TLMergedBundle {
   def apply(b: TLBundleB, params: TLBundleParameters, hasCorruptDenied: Boolean): TLMergedBundle = {
     val merged = Wire(new TLMergedBundle(params, hasCorruptDenied))
     merged.chanId        := TL_CHAN_ID_B
-    merged.opcode        := b.opcode
-    merged.param         := b.param
-    merged.size          := b.size
-    merged.source        := b.source
-    merged.address       := b.address
-    merged.data          := b.data
+    merged.opcode        := (b.opcode: UInt)
+    merged.param         := (b.param: UInt)
+    merged.size          := (b.size: UInt)
+    merged.source        := (b.source: UInt)
+    merged.address       := (b.address: UInt)
+    merged.data          := (b.data: UInt)
     if (hasCorruptDenied)
-      merged.corrupt.get := b.corrupt
-    merged.union         := b.mask
+      merged.corrupt.get := (b.corrupt: Bool)
+    merged.union         := (b.mask: UInt)
     merged.last          := true.B
     merged
   }
@@ -285,14 +285,14 @@ object TLMergedBundle {
   def apply(c: TLBundleC, params: TLBundleParameters, hasCorruptDenied: Boolean): TLMergedBundle = {
     val merged = Wire(new TLMergedBundle(params, hasCorruptDenied))
     merged.chanId  := TL_CHAN_ID_C
-    merged.opcode  := c.opcode
-    merged.param   := c.param
-    merged.size    := c.size
-    merged.source  := c.source
-    merged.address := c.address
-    merged.data    := c.data
+    merged.opcode  := (c.opcode: UInt)
+    merged.param   := (c.param: UInt)
+    merged.size    := (c.size: UInt)
+    merged.source  := (c.source: UInt)
+    merged.address := (c.address: UInt)
+    merged.data    := (c.data: UInt)
     if (hasCorruptDenied) {
-      merged.corrupt.get := c.corrupt
+      merged.corrupt.get := (c.corrupt: Bool)
       merged.union       := DontCare
     } else {
       merged.union := 0.U //error
@@ -306,15 +306,15 @@ object TLMergedBundle {
   def apply(d: TLBundleD, params: TLBundleParameters, hasCorruptDenied: Boolean): TLMergedBundle = {
     val merged = Wire(new TLMergedBundle(params, hasCorruptDenied))
     merged.chanId  := TL_CHAN_ID_D
-    merged.opcode  := d.opcode
-    merged.param   := d.param
-    merged.size    := d.size
-    merged.source  := d.source
+    merged.opcode  := (d.opcode: UInt)
+    merged.param   := (d.param: UInt)
+    merged.size    := (d.size: UInt)
+    merged.source  := (d.source: UInt)
     merged.address := DontCare
-    merged.data    := d.data
+    merged.data    := (d.data: UInt)
     if (hasCorruptDenied) {
-      merged.corrupt.get := d.corrupt
-      merged.union       := Cat(d.sink: UInt, d.denied)
+      merged.corrupt.get := (d.corrupt: Bool)
+      merged.union       := Cat(d.sink: UInt, d.denied: Bool)
     } else {
       merged.union := Cat(d.sink: UInt, 0.U) //error
     }
