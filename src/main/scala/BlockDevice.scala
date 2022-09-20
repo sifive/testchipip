@@ -123,6 +123,11 @@ class BlockDeviceTrackerModule(outer: BlockDeviceTracker)
     val bdev = new BlockDeviceIO
   })
 
+  // CAAT-2780 Legacy Chisel would implicitly set dont care for bundles
+  // The bundle has been found to have missing fields for some configs.
+  // The specific fields should be tracked down and set explicitly
+  io.front.complete.bits := DontCare
+  
   val (tl, edge) = outer.node.out(0)
   val req = Reg(new BlockDeviceFrontendRequest)
 
@@ -298,6 +303,10 @@ trait BlockDeviceFrontendModule extends HasRegMap
   val write = Reg(Bool())
 
   val allocRead = Wire(new RegisterReadIO(UInt(tagBits.W)))
+  // CAAT-2780 Legacy Chisel would implicitly set dont care for bundles
+  // The bundle has been found to have missing fields for some configs.
+  // The specific fields should be tracked down and set explicitly
+  io.back.req.bits.tag := DontCare
   io.back.req.valid := allocRead.request.valid
   io.back.req.bits.addr := addr
   io.back.req.bits.offset := offset
