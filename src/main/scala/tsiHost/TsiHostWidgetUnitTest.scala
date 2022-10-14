@@ -8,6 +8,7 @@ import chisel3.util._
 import freechips.rocketchip.config.{Parameters, Field}
 import freechips.rocketchip.subsystem.{BaseSubsystem}
 import freechips.rocketchip.regmapper.{HasRegMap, RegField}
+import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.tilelink.{TLTestRAM, TLROM, TLError}
@@ -20,7 +21,7 @@ import SerialAdapter._
  * Unit test that uses the TLTSIHostWidget to interact with a target Serdesser.
  * Currently only tests the backend (bypassing the mmio).
  */
-class TSIHostWidgetBackendTest(implicit p: Parameters) extends LazyModule {
+class TSIHostWidgetBackendTest(implicit p: Parameters) extends LazyModule with HasImplicitErrorReportReducerNexusNode {
   // params matching the configuration for the TSIHost widget
   val systemBeatBytes = 8 // should match with the host beat bytes
   val params = p(PeripheryTSIHostKey).head
@@ -110,7 +111,7 @@ class TSIHostWidgetBackendTestWrapper(implicit p: Parameters) extends UnitTest(1
 /**
  * Unit test that uses the TLTSIHostWidget to interact with a target Serdesser.
  */
-class TSIHostWidgetTest(implicit p: Parameters) extends LazyModule {
+class TSIHostWidgetTest(implicit p: Parameters) extends LazyModule with HasImplicitErrorReportReducerNexusNode {
   // params matching the configuration for the TSIHost widget
   val systemBeatBytes = 8 // should match with the host beat bytes
   val params = p(PeripheryTSIHostKey).head

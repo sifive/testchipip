@@ -6,6 +6,7 @@ import chisel3.util._
 import freechips.rocketchip.config.{Field, Parameters}
 import freechips.rocketchip.subsystem.{CacheBlockBytes, BaseSubsystem, TLBusWrapperLocation, PBUS, FBUS}
 import freechips.rocketchip.diplomacy._
+import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
 import freechips.rocketchip.regmapper.{RegisterReadIO, RegField, HasRegMap}
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.util.{ParameterizedBundle, DecoupledHelper, UIntIsOneOf}
@@ -333,7 +334,7 @@ class BlockDeviceFrontend(c: BlockDeviceFrontendParams)(implicit p: Parameters)
       new TLRegModule(c, _, _) with BlockDeviceFrontendModule)
 
 class BlockDeviceController(address: BigInt, beatBytes: Int)(implicit p: Parameters)
-    extends LazyModule with HasBlockDeviceParameters {
+    extends LazyModule with HasBlockDeviceParameters with HasImplicitErrorReportReducerNexusNode {
 
   val mmio = TLIdentityNode()
   val mem = TLIdentityNode()
