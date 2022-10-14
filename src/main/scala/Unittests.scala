@@ -5,6 +5,7 @@ import chisel3.util._
 import freechips.rocketchip.config.Parameters
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.devices.tilelink.{DevNullParams, TLTestRAM, TLROM, TLError}
+import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
 import freechips.rocketchip.subsystem.CacheBlockBytes
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.unittest._
@@ -81,7 +82,8 @@ class BlockDeviceTrackerTestDriver(nSectors: Int)(implicit p: Parameters)
 }
 
 class BlockDeviceTrackerTest(implicit p: Parameters) extends LazyModule
-    with HasBlockDeviceParameters {
+    with HasBlockDeviceParameters
+    with HasImplicitErrorReportReducerNexusNode {
   val nSectors = 4
   val beatBytes = dataBitsPerBeat / 8
 
@@ -125,7 +127,7 @@ class BlockDeviceTrackerTestWrapper(implicit p: Parameters) extends UnitTest {
   io.finished := test.io.finished
 }
 
-class SerdesTest(implicit p: Parameters) extends LazyModule {
+class SerdesTest(implicit p: Parameters) extends LazyModule with HasImplicitErrorReportReducerNexusNode {
   val idBits = 2
   val beatBytes = 8
   val lineBytes = 64
@@ -182,7 +184,7 @@ class SerdesTestWrapper(implicit p: Parameters) extends UnitTest {
   when (testReset && io.start) { testReset := false.B }
 }
 
-class BidirectionalSerdesTest(implicit p: Parameters) extends LazyModule {
+class BidirectionalSerdesTest(implicit p: Parameters) extends LazyModule with HasImplicitErrorReportReducerNexusNode {
   val idBits = 2
   val beatBytes = 8
   val lineBytes = 64
@@ -305,7 +307,7 @@ class SwitcherDummy(implicit p: Parameters) extends LazyModule {
   }
 }
 
-class SwitcherTest(implicit p: Parameters) extends LazyModule {
+class SwitcherTest(implicit p: Parameters) extends LazyModule with HasImplicitErrorReportReducerNexusNode {
   val inIdBits = 3
   val beatBytes = 8
   val lineBytes = 64
@@ -366,7 +368,7 @@ class SwitchTestWrapper(implicit p: Parameters) extends UnitTest {
   io.finished := test.io.finished
 }
 
-class TLRingNetworkTest(implicit p: Parameters) extends LazyModule {
+class TLRingNetworkTest(implicit p: Parameters) extends LazyModule with HasImplicitErrorReportReducerNexusNode {
   val beatBytes = 8
   val blockBytes = p(CacheBlockBytes)
 

@@ -7,6 +7,7 @@ import freechips.rocketchip.config.{Parameters, Field}
 import freechips.rocketchip.subsystem.{BaseSubsystem, MasterPortParams}
 import freechips.rocketchip.regmapper.{HasRegMap, RegFieldGroup}
 import freechips.rocketchip.diplomacy._
+import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.util._
 import freechips.rocketchip.tile.{XLen}
@@ -147,7 +148,7 @@ class TLTSIHostMMIOFrontend(val beatBytesIn: Int, params: TSIHostParams)(implici
  * @param params the TSI parameters for the widget
  */
 class TLTSIHostBackend(val params: TSIHostParams)(implicit p: Parameters)
-  extends LazyModule
+  extends LazyModule with HasImplicitErrorReportReducerNexusNode
 {
   // module to take in a decoupled io tsi stream and convert to a TL stream
   val serialAdapter = LazyModule(new SerialAdapter)
@@ -201,7 +202,7 @@ class TLTSIHostBackend(val params: TSIHostParams)(implicit p: Parameters)
  * @param params the TSI parameters for the widget
  */
 class TLTSIHostWidget(val beatBytes: Int, val params: TSIHostParams)(implicit p: Parameters)
-  extends LazyModule
+  extends LazyModule with HasImplicitErrorReportReducerNexusNode
 {
   // this should communicate over MMIO to the core (tx and rx)
   val mmioFrontend = LazyModule(new TLTSIHostMMIOFrontend(beatBytes, params))
@@ -294,6 +295,7 @@ object TLTSIHostWidget {
 
     // connect the manager (mmioNode) to the client (the bus wanted)
     cbus.coupleTo(s"slave_named_$name") {
+      implicit val errorReportNexusNode = cbus.errorReportNexusNode
       tsiHostWidget.mmioNode := TLFragmenter(cbus.beatBytes, cbus.blockBytes) := _
     }
 

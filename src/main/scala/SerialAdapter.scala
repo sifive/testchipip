@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import chisel3.experimental.{IO, DataMirror}
 import freechips.rocketchip.config.{Parameters, Field}
+import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.debug.HasPeripheryDebug
@@ -440,7 +441,9 @@ class SerialRAM(
   memParams: MasterPortParams,
   romParams: SerialTLROMParams,
   managerEdge: TLEdgeParameters,
-  clientEdge: TLEdgeParameters)(implicit p: Parameters) extends LazyModule {
+  clientEdge: TLEdgeParameters)(implicit p: Parameters) extends LazyModule
+    with HasImplicitErrorReportReducerNexusNode
+{
   val managerParams = clientEdge.slave // the managerParams are the chip-side clientParams
   val clientParams = managerEdge.master // The clientParams are the chip-side managerParams
   val adapter = LazyModule(new SerialAdapter)
@@ -485,7 +488,7 @@ class MultiClockSerialAXIRAM(
   romParams: SerialTLROMParams,
   axiMemOverSerialTLParams: AXIMemOverSerialTLClockParams,
   managerEdge: TLEdgeParameters,
-  clientEdge: TLEdgeParameters)(implicit p: Parameters) extends LazyModule {
+  clientEdge: TLEdgeParameters)(implicit p: Parameters) extends LazyModule with HasImplicitErrorReportReducerNexusNode {
 
   // setup serdes and serial adapter
   val managerParams = clientEdge.slave // the managerParams are the chip-side clientParams
