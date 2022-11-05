@@ -188,8 +188,8 @@ trait CanHaveTraceIOModuleImp { this: LazyModuleImpLike =>
 
     // Since clock & reset are not included with the traced instruction, plumb that out manually
     (tio.traces zip (outer.tile_prci_domains zip tileInsts)).foreach { case (port, (prci, insts)) =>
-      port.clock := prci.module.clock
-      port.reset := prci.module.reset.asBool
+      port.clock := prci.module.childClock
+      port.reset := prci.module.childReset.asBool
       port.insns := insts
     }
 
