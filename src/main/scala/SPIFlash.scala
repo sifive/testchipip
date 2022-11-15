@@ -5,7 +5,7 @@ import chisel3.util.{HasBlackBoxResource}
 import chisel3.experimental.{Analog, IntParam, StringParam}
 
 import freechips.rocketchip.config.{Parameters}
-import freechips.rocketchip.util.{PlusArgArtefacts}
+import freechips.rocketchip.util.{PlusArgArtifacts}
 import sifive.blocks.devices.spi.{PeripherySPIFlashKey}
 
 class SPIChipIO(val csWidth: Int = 1) extends Bundle {
@@ -30,9 +30,9 @@ class SimSPIFlashModel(capacityBytes: BigInt, id: Int, rdOnly: Boolean = true) e
   val io = IO(Flipped(new SPIFlashIO()))
 
   // The model adds a +spiflash<ID>=<path> plusarg. It's not a numeric, so we can't use
-  // plusarg_reader, but we can still add to the PlusArgArtefacts
+  // plusarg_reader, but we can still add to the PlusArgArtifacts
   // Unfortunately it requires a numeric default, but that's really just a docstring issue
-  PlusArgArtefacts.append(SPIFlashPlusarg(id), 0, s"Binary image to mount to SPI flash memory ${id}")
+  PlusArgArtifacts.append(SPIFlashPlusarg(id), 0, s"Binary image to mount to SPI flash memory ${id}")
 
   require(capacityBytes < 0x100000000L, "SimSPIFlashModel only supports 32-bit addressing")
 

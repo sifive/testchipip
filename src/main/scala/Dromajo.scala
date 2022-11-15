@@ -5,7 +5,7 @@ import chisel3.util._
 import chisel3.experimental.{IntParam, StringParam}
 import freechips.rocketchip.subsystem.{InSubsystem}
 import freechips.rocketchip.config.{Parameters}
-import freechips.rocketchip.util.{UIntToAugmentedUInt, ElaborationArtefacts}
+import freechips.rocketchip.util.{UIntToAugmentedUInt, ElaborationArtifacts}
 import freechips.rocketchip.subsystem.{ExtMem, HierarchicalLocation}
 import freechips.rocketchip.devices.tilelink.{BootROMLocated, CLINTConsts, CLINTKey, PLICConsts, PLICKey}
 
@@ -19,7 +19,7 @@ object DromajoConstants {
  * Helper object/function to generate Dromajo header file
  */
 object DromajoHelper {
-  def addArtefacts(location: HierarchicalLocation)(implicit p: Parameters): Unit = {
+  def addArtifacts(location: HierarchicalLocation)(implicit p: Parameters): Unit = {
     var dromajoParams: String = ""
     dromajoParams += "#ifndef DROMAJO_PARAMS_H"
     dromajoParams += "\n#define DROMAJO_PARAMS_H"
@@ -42,7 +42,7 @@ object DromajoHelper {
     }
     dromajoParams += "\n\n#endif"
 
-    ElaborationArtefacts.add("""dromajo_params.h""", dromajoParams)
+    ElaborationArtifacts.add("""dromajo_params.h""", dromajoParams)
   }
 }
 
