@@ -11,6 +11,7 @@ import freechips.rocketchip.rocket.{TracedInstruction}
 import freechips.rocketchip.util._
 import freechips.rocketchip.tile.{BaseTile}
 import freechips.rocketchip.diplomacy.{BundleBridgeSource, BundleBroadcast, BundleBridgeNexusNode}
+import freechips.rocketchip.prci.{ClockSinkNode, ClockSinkParameters}
 
 //***************************************************************************
 // Extended Trace Instruction Utilities:
@@ -170,6 +171,12 @@ trait CanHaveTraceIO { this: HasTiles =>
     case tile => None
   }.map { _.extTraceNode }
 
+  val clockNodes = tile_prci_domains.map {case prci => 
+    val clockNode = ClockSinkNode(Seq(ClockSinkParameters()))
+    clockNode := prci.tile_clock_domain.ungatedClockNode
+    clockNode
+  }
+
   // Convert all instructions to extended type
   tileTraceNodes.foreach { traceNexus := _ }
   extTileTraceNodes.foreach { extTraceNexus := _ }
@@ -187,9 +194,10 @@ trait CanHaveTraceIOModuleImp { this: LazyModuleImpLike =>
       (outer.extTraceNexus.in) .map { case (tileTrace, _) => DeclockedTracedInstruction.fromExtVec(tileTrace) })
 
     // Since clock & reset are not included with the traced instruction, plumb that out manually
-    (tio.traces zip (outer.tile_prci_domains zip tileInsts)).foreach { case (port, (prci, insts)) =>
-      port.clock := prci.module.clock
-      port.reset := prci.module.reset.asBool
+    (tio.traces zip (outer.clockNodes zip tileInsts)).foreach { case (port, (clockNode, insts)) =>
+      val (clockBundle, _) = clockNode.in.head
+      port.clock := clockBundle.clock
+      port.reset := clockBundle.reset
       port.insns := insts
     }
 
