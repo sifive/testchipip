@@ -327,7 +327,7 @@ case object SerialTLKey extends Field[Option[SerialTLParams]](None)
 
 case class SerialTLAttachParams(
   masterWhere: TLBusWrapperLocation = FBUS,
-  slaveWhere: TLBusWrapperLocation = MBUS,
+  slaveWhere: TLBusWrapperLocation = MBUS.asInstanceOf[Location[TLBusWrapper]],
   slaveCrossingType: ClockCrossingType = SynchronousCrossing()
 )
 case object SerialTLAttachKey extends Field[SerialTLAttachParams](SerialTLAttachParams())

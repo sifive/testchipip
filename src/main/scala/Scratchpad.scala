@@ -2,10 +2,10 @@ package testchipip
 
 import chisel3._
 
-import freechips.rocketchip.subsystem.BaseSubsystem
+import freechips.rocketchip.subsystem.{BaseSubsystem, MBUS}
 import freechips.rocketchip.config.{Field, Config}
 import freechips.rocketchip.diplomacy.{LazyModule, AddressSet}
-import freechips.rocketchip.tilelink.{TLRAM}
+import freechips.rocketchip.tilelink.{TLBusWrapper, TLRAM}
 
 case class BackingScratchpadParams(
   base: BigInt,
@@ -20,6 +20,7 @@ trait CanHaveBackingScratchpad { this: BaseSubsystem =>
   private val portName = "Backing-Scratchpad"
 
   val spadOpt = p(BackingScratchpadKey).map { param =>
+    val mbus = subscribe(MBUS).asInstanceOf[TLBusWrapper]
     val spad = mbus { LazyModule(new TLRAM(address=AddressSet(param.base, param.mask), beatBytes=mbus.beatBytes, devName=Some("backing-scratchpad"))) }
     mbus.toVariableWidthSlave(Some(portName)) { spad.node }
     spad
