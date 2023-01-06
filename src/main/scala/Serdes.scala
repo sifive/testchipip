@@ -502,9 +502,9 @@ object TLMergedBundle {
   }
 }
 
-class TLSerdes(w: Int, params: Seq[TLManagerParameters], beatBytes: Int = 8, hasCorruptDenied: Boolean = true)(implicit p: Parameters) extends LazyModule {
+class TLSerdes(w: Int, params: Seq[TLSlavePortParameters], hasCorruptDenied: Boolean = true)(implicit p: Parameters) extends LazyModule {
 
-  val node = TLManagerNode(params.map(manager => TLSlavePortParameters.v1(managers = Seq(manager), beatBytes = beatBytes)))
+  val node = TLManagerNode(params)
 
   lazy val module = new Impl
   class Impl extends LazyModuleImp(this) {
@@ -542,9 +542,9 @@ class TLSerdes(w: Int, params: Seq[TLManagerParameters], beatBytes: Int = 8, has
   }
 }
 
-class TLDesser(w: Int, params: Seq[TLClientParameters], hasCorruptDenied: Boolean = true)(implicit p: Parameters) extends LazyModule {
+class TLDesser(w: Int, params: Seq[TLMasterPortParameters], hasCorruptDenied: Boolean = true)(implicit p: Parameters) extends LazyModule {
 
-  val node = TLClientNode(params.map(client => TLMasterPortParameters.v1(Seq(client))))
+  val node = TLClientNode(params)
 
   lazy val module = new Impl
   class Impl extends LazyModuleImp(this) {
