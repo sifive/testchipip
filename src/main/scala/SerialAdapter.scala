@@ -2,7 +2,7 @@ package testchipip
 
 import chisel3._
 import chisel3.util._
-import chisel3.experimental.{IO, DataMirror}
+import chisel3.experimental.DataMirror
 import freechips.rocketchip.config.{Parameters, Field}
 import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
 import freechips.rocketchip.subsystem._
