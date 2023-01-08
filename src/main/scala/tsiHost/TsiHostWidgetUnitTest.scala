@@ -163,7 +163,7 @@ class TSIHostWidgetTest(implicit p: Parameters) extends LazyModule with HasImpli
   hostTSIHostWidget.mmioNode := patternPusher.node
 
   // create an i/o node to connect to
-  val tsiHostIOSink = hostTSIHostWidget.ioNode.makeSink
+  val tsiHostIOSink = hostTSIHostWidget.ioNode.makeSink()
 
   // implementation of the module
   lazy val module = new Impl
