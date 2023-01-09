@@ -74,7 +74,7 @@ class SPIFlashMemCtrl(addrBits: Int) extends BlackBox(Map(
 }
 
 object SimSPIFlashModel {
-  def connect(spi: Seq[SPIChipIO], reset: Reset, rdOnly: Boolean = true)(implicit p: Parameters) {
+  def connect(spi: Seq[SPIChipIO], reset: Reset, rdOnly: Boolean = true)(implicit p: Parameters): Unit = {
     spi.zip(p(PeripherySPIFlashKey)).zipWithIndex.foreach { case ((port, params), i) =>
       val spi_mem = Module(new SimSPIFlashModel(params.fSize, i, rdOnly))
       spi_mem.suggestName(s"spi_mem_${i}")

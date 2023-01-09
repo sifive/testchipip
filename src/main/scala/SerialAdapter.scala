@@ -109,7 +109,7 @@ case object SerialAdapter {
 
   def connectSimSerial(serial: SerialIO, clock: Clock, reset: Reset): Bool = connectSimSerial(Some(serial), clock, reset)
 
-  def tieoff(serial: Option[SerialIO]) {
+  def tieoff(serial: Option[SerialIO]): Unit = {
     serial.foreach { s =>
       s.in.valid := false.B
       s.in.bits := DontCare
@@ -117,7 +117,7 @@ case object SerialAdapter {
     }
   }
 
-  def tieoff(serial: SerialIO) { tieoff(Some(serial)) }
+  def tieoff(serial: SerialIO): Unit = { tieoff(Some(serial)) }
 }
 import SerialAdapter._
 

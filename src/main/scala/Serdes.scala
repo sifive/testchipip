@@ -11,7 +11,7 @@ class SerialIO(val w: Int) extends Bundle {
   val in  = Flipped(Decoupled(UInt(w.W)))
   val out = Decoupled(UInt(w.W))
 
-  def flipConnect(other: SerialIO) {
+  def flipConnect(other: SerialIO): Unit = {
     in       <> other.out
     other.in <> out
   }
@@ -21,7 +21,7 @@ class ValidSerialIO(val w: Int) extends Bundle {
   val in  = Flipped(Valid(UInt(w.W)))
   val out = Valid(UInt(w.W))
 
-  def flipConnect(other: ValidSerialIO) {
+  def flipConnect(other: ValidSerialIO): Unit = {
     in       <> other.out
     other.in <> out
   }
@@ -37,7 +37,7 @@ class StreamIO(val w: Int) extends Bundle {
   val in  = Flipped(Decoupled(new StreamChannel(w)))
   val out = Decoupled(new StreamChannel(w))
 
-  def flipConnect(other: StreamIO) {
+  def flipConnect(other: StreamIO): Unit = {
     in       <> other.out
     other.in <> out
   }
@@ -131,7 +131,7 @@ class StreamWidener(inW: Int, outW: Int) extends Module {
 }
 
 object StreamWidthAdapter {
-  def apply(out: DecoupledIO[StreamChannel], in: DecoupledIO[StreamChannel]) {
+  def apply(out: DecoupledIO[StreamChannel], in: DecoupledIO[StreamChannel]): Unit = {
     if (out.bits.w > in.bits.w) {
       val widener = Module(new StreamWidener(in.bits.w, out.bits.w))
       widener.io.in <> in
@@ -145,7 +145,7 @@ object StreamWidthAdapter {
     }
   }
 
-  def apply(a: StreamIO, b: StreamIO) {
+  def apply(a: StreamIO, b: StreamIO): Unit = {
     apply(a.out, b.out)
     apply(b.in, a.in)
   }
@@ -155,7 +155,7 @@ class ValidStreamIO(w: Int) extends Bundle {
   val in  = Flipped(Valid(new StreamChannel(w)))
   val out = Valid(new StreamChannel(w))
 
-  def flipConnect(other: ValidStreamIO) {
+  def flipConnect(other: ValidStreamIO): Unit = {
     in       <> other.out
     other.in <> out
   }

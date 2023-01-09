@@ -336,7 +336,7 @@ object TLTSIHostWidget {
    * @param clock the clock to run the widget on
    * @return none
    */
-  def tieoff(port: TSIHostWidgetIO, clock: Clock) {
+  def tieoff(port: TSIHostWidgetIO, clock: Clock): Unit = {
     port.serial.in.bits := 0.U
     port.serial.in.valid := false.B
     port.serial.out.ready := true.B
@@ -349,7 +349,7 @@ object TLTSIHostWidget {
    * @param port the i/o bundle to connect
    * @return none
    */
-  def loopback(port: TSIHostWidgetIO) {
+  def loopback(port: TSIHostWidgetIO): Unit = {
     port.serial.in <> port.serial.out
   }
 }

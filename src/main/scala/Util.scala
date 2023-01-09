@@ -188,7 +188,7 @@ class TLSinkSetter(endSinkId: Int)(implicit p: Parameters) extends LazyModule {
   lazy val module = new Impl
   class Impl extends LazyModuleImp(this) {
     // FIXME: bulk connect
-    def connect[T <: TLBundleBase](out: DecoupledIO[T], in: DecoupledIO[T]) {
+    def connect[T <: TLBundleBase](out: DecoupledIO[T], in: DecoupledIO[T]): Unit = {
       out.valid := in.valid
       out.bits := in.bits
       in.ready := out.ready
@@ -225,7 +225,7 @@ class TLSourceSetter(sourceId: Int)(implicit p: Parameters) extends LazyModule {
   lazy val module = new Impl
   class Impl extends LazyModuleImp(this) {
     // FIXME: bulk connect
-    def connect[T <: TLBundleBase](out: DecoupledIO[T], in: DecoupledIO[T]) {
+    def connect[T <: TLBundleBase](out: DecoupledIO[T], in: DecoupledIO[T]): Unit = {
       out.valid := in.valid
       out.bits := in.bits
       in.ready := out.ready
