@@ -78,7 +78,7 @@ trait HasTLNetwork {
       bnet: DecoupledIO[NetworkBundle[TLBundleB]],
       cnet: DecoupledIO[NetworkBundle[TLBundleC]],
       dnet: DecoupledIO[NetworkBundle[TLBundleD]],
-      enet: DecoupledIO[NetworkBundle[TLBundleE]]) {
+      enet: DecoupledIO[NetworkBundle[TLBundleE]]): Unit = {
 
     val edgeIn = edgesIn(i)
     val inRange = inputIdRanges(i)
@@ -147,7 +147,7 @@ trait HasTLNetwork {
       bnet: DecoupledIO[NetworkBundle[TLBundleB]],
       cnet: DecoupledIO[NetworkBundle[TLBundleC]],
       dnet: DecoupledIO[NetworkBundle[TLBundleD]],
-      enet: DecoupledIO[NetworkBundle[TLBundleE]]) {
+      enet: DecoupledIO[NetworkBundle[TLBundleE]]): Unit = {
     val edgeOut = edgesOut(i)
     val outRange = outputIdRanges(i)
     val reachable = reachabilityMatrix.map(seq => seq(i))
@@ -197,7 +197,7 @@ trait HasTLNetwork {
       net: DecoupledIO[NetworkBundle[T]], tl: DecoupledIO[T],
       selects: Seq[Bool], ids: Seq[UInt], edge: TLEdge,
       sourceStart: BigInt = -1, sinkStart: BigInt = -1,
-      connect: Boolean = true) {
+      connect: Boolean = true): Unit = {
     if (connect) {
       net.valid := tl.valid
       net.bits.netId := Mux1H(selects, ids)
@@ -230,7 +230,7 @@ trait HasTLNetwork {
   def unwrap[T <: TLChannel](
       tl: DecoupledIO[T], net: DecoupledIO[NetworkBundle[T]],
       idSize: Int = 0,
-      connect: Boolean = true) {
+      connect: Boolean = true): Unit = {
     if (connect) {
       tl.valid := net.valid
       tl.bits := net.bits.payload

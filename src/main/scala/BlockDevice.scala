@@ -486,7 +486,7 @@ trait CanHavePeripheryBlockDevice { this: BaseSubsystem =>
 }
 
 object SimBlockDevice {
-  def connect(clock: Clock, reset: Bool, bdev: Option[BlockDeviceIO])(implicit p: Parameters) {
+  def connect(clock: Clock, reset: Bool, bdev: Option[BlockDeviceIO])(implicit p: Parameters): Unit = {
     bdev.foreach { b =>
       val sim = Module(new SimBlockDevice)
       sim.io.clock := clock
@@ -497,7 +497,7 @@ object SimBlockDevice {
 }
 
 object BlockDeviceModel {
-  def connect(bdev: Option[BlockDeviceIO])(implicit p: Parameters) {
+  def connect(bdev: Option[BlockDeviceIO])(implicit p: Parameters): Unit = {
     bdev.foreach { b =>
       val model = Module(new BlockDeviceModel(16))
       model.io <> b
