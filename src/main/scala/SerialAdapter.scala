@@ -97,6 +97,20 @@ case object SerialAdapter {
     ram
   }
 
+  def connectControlOnlyHarness(desser: TLDesser, port: SerialIO, reset: Reset): SerialHarness = {
+    implicit val p: Parameters = desser.p
+
+    val harness = LazyModule(new SerialHarness(
+      p(SerialTLKey).get.width,
+      clientEdge = desser.node.edges.out(0)
+    ))
+
+    val module = Module(harness.module)
+    module.io.ser <> port
+
+    harness
+  }
+
   def connectSimSerial(serial: Option[SerialIO], clock: Clock, reset: Reset): Bool = {
     serial.map { s =>
       val sim = Module(new SimSerial(s.w))
@@ -597,6 +611,33 @@ class MultiClockSerialAXIRAM(
     // connect the serdes and serial adapter in the serdes clock domain
     serdesser.module.io.ser.in <> io.ser.out
     io.ser.in <> serdesser.module.io.ser.out
+    io.tsi_ser <> adapter.module.io.serial
+  }
+}
+
+class SerialHarness(
+  w: Int,
+  clientEdge: TLEdgeParameters)(implicit p: Parameters) extends LazyModule
+    with HasImplicitErrorReportReducerNexusNode
+{
+  val managerParams = clientEdge.slave // the managerParams are the chip-side clientParams
+  val adapter = LazyModule(new SerialAdapter)
+  val serdes = LazyModule(new TLSerdes(
+    w,
+    Seq(managerParams)
+  ))
+
+  serdes.node := TLBuffer() := adapter.node
+
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
+    val io = IO(new Bundle {
+      val ser = Flipped(new SerialIO(w))
+      val tsi_ser = new SerialIO(SERIAL_TSI_WIDTH)
+    })
+
+    serdes.module.io.ser.head.in <> io.ser.out
+    io.ser.in <> serdes.module.io.ser.head.out
     io.tsi_ser <> adapter.module.io.serial
   }
 }

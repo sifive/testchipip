@@ -139,18 +139,21 @@ class SerdesTest(implicit p: Parameters) extends LazyModule with HasImplicitErro
 
   val serdes = LazyModule(new TLSerdes(
     w = serWidth,
-    params = Seq(TLSlaveParameters.v1(
-      address = Seq(AddressSet(0, 0xffff)),
-      regionType = RegionType.UNCACHED,
-      supportsGet = TransferSizes(1, lineBytes),
-      supportsPutFull = TransferSizes(1, lineBytes))),
-    beatBytes = beatBytes))
+    params = Seq(TLSlavePortParameters.v1(
+      managers = Seq(TLSlaveParameters.v1(
+        address = Seq(AddressSet(0, 0xffff)),
+        regionType = RegionType.UNCACHED,
+        supportsGet = TransferSizes(1, lineBytes),
+        supportsPutFull = TransferSizes(1, lineBytes))),
+        beatBytes = beatBytes))))
 
   val desser = LazyModule(new TLDesser(
     w = serWidth,
-    params = Seq(TLMasterParameters.v1(
-      name = "tl-desser",
-      sourceId = IdRange(0, 1 << idBits)))))
+    params = Seq(TLMasterPortParameters.v1(
+      clients = Seq(TLMasterParameters.v1(
+        name = "tl-desser",
+        sourceId = IdRange(0, 1 << idBits)))
+    ))))
 
   val testram = LazyModule(new TLTestRAM(
     address = AddressSet(0, 0xffff),
