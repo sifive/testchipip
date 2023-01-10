@@ -9,7 +9,7 @@ import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
 import freechips.rocketchip.regmapper.{RegisterReadIO, RegField, HasRegMap}
 import freechips.rocketchip.tilelink._
-import freechips.rocketchip.util.{ParameterizedBundle, DecoupledHelper, UIntIsOneOf}
+import freechips.rocketchip.util.{ParameterizedBundle, DecoupledHelper}
 import freechips.rocketchip.prci.{ClockSinkDomain}
 import scala.math.max
 
@@ -106,8 +106,13 @@ class BlockDeviceArbiter(implicit p: Parameters) extends BlockDeviceModule {
 class BlockDeviceTracker(id: Int)(implicit p: Parameters)
     extends LazyModule with HasBlockDeviceParameters {
 
-  val node = TLHelper.makeClientNode(
-    name = s"blkdev-tracker$id", sourceId = IdRange(0, 1))
+  val node = TLClientNode(Seq(TLMasterPortParameters.v1(
+    clients = Seq(TLMasterParameters.v2(
+      name     = s"blkdev-tracker$id",
+      sourceId = IdRange(0, 1),
+      emits    = TLMasterToSlaveTransferSizes.noAcquires, // TL2 allows only 1 transfer size, and coherent traffic is not expected here
+    )
+  ))))
 
   lazy val module = new BlockDeviceTrackerModule(this)
 }
@@ -125,7 +130,7 @@ class BlockDeviceTrackerModule(outer: BlockDeviceTracker)
   })
 
   io.front := DontCare
-  
+
   val (tl, edge) = outer.node.out(0)
   val req = Reg(new BlockDeviceFrontendRequest)
 
