@@ -1,25 +1,20 @@
 package testchipip
 
-import chisel3._
-import chisel3.util._
-import chisel3.experimental.{IO, DataMirror}
-import freechips.rocketchip.config.{Parameters, Field}
-import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
+import chisel3.experimental.IO
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
-import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
-import freechips.rocketchip.util._
-import freechips.rocketchip.prci.{ClockSourceNode, ClockSourceParameters, ClockSinkDomain, ClockBundle, ClockBundleParameters}
+import freechips.rocketchip.prci.ClockSinkDomain
 
 trait CanHavePeripheryTLSerialControlOnly { this: BaseSubsystem =>
   private val portName = "serial-tl"
   val (desser, serial_tl) = p(SerialTLKey).map { params =>
     val client = locateTLBusWrapper(p(SerialTLAttachKey).masterWhere) // The bus for which this acts as a client
     val clientParams = TLMasterPortParameters.v1(
-      clients = Seq(TLMasterParameters.v1(
-        name = "serial-tl",
-        sourceId = IdRange(0, 1)
+      clients = Seq(TLMasterParameters.v2(
+        name     = "serial-tl",
+        sourceId = IdRange(0, 1),
+        emits    = TLMasterToSlaveTransferSizes.noAcquires, // TL2 allows only 1 transfer size, and coherent traffic is not expected here
       ))
     )
 
