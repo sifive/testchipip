@@ -5,17 +5,13 @@ import scala.util.Random
 import chisel3._
 import chisel3.util._
 
-import freechips.rocketchip.config.{Parameters, Field}
-import freechips.rocketchip.subsystem.{BaseSubsystem}
-import freechips.rocketchip.regmapper.{HasRegMap, RegField}
+import freechips.rocketchip.config.Parameters
 import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
-import freechips.rocketchip.devices.tilelink.{TLTestRAM, TLROM, TLError}
-import freechips.rocketchip.util._
+import freechips.rocketchip.devices.tilelink.TLTestRAM
 import freechips.rocketchip.unittest._
 
-import SerialAdapter._
 
 /**
  * Unit test that uses the TLTSIHostWidget to interact with a target Serdesser.

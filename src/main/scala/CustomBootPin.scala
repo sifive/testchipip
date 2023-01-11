@@ -6,11 +6,7 @@ import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.tilelink._
-import freechips.rocketchip.regmapper._
 import freechips.rocketchip.subsystem._
-import freechips.rocketchip.util._
-import freechips.rocketchip.tile._
-import freechips.rocketchip.prci._
 
 case class CustomBootPinParams(
   customBootAddress: BigInt = 0x80000000L, // Default is DRAM_BASE

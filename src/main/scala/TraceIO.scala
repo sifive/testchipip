@@ -1,12 +1,10 @@
 package testchipip
 
 import chisel3._
-import chisel3.util._
 
-import freechips.rocketchip.subsystem.{BaseSubsystem, HasTiles}
-import freechips.rocketchip.config.{Field, Config, Parameters}
-import freechips.rocketchip.diplomacy.{LazyModule, AddressSet, LazyModuleImpLike}
-import freechips.rocketchip.tilelink.{TLRAM}
+import freechips.rocketchip.subsystem.HasTiles
+import freechips.rocketchip.config.{Field, Parameters}
+import freechips.rocketchip.diplomacy.LazyModuleImpLike
 import freechips.rocketchip.rocket.{TracedInstruction}
 import freechips.rocketchip.util._
 import freechips.rocketchip.tile.{BaseTile}

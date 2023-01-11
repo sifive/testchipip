@@ -6,7 +6,6 @@ import chisel3.experimental.{IntParam}
 
 import freechips.rocketchip.config.{Parameters}
 import freechips.rocketchip.subsystem.{PeripheryBusKey}
-import freechips.rocketchip.diplomacy._
 
 import sifive.blocks.devices.uart._
 import testchipip.{SerialIO}

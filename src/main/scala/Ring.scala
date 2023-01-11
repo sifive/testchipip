@@ -9,7 +9,7 @@ import freechips.rocketchip.diplomaticobjectmodel.logicaltree.LogicalTreeNode
 import freechips.rocketchip.subsystem.{SystemBus, SystemBusParams, HasTileLinkLocations}
 import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
 import freechips.rocketchip.tilelink._
-import freechips.rocketchip.util.{HellaPeekingArbiter, BooleanToAugmentedBoolean, Location}
+import freechips.rocketchip.util.{HellaPeekingArbiter, Location}
 
 abstract class RingInternalIO[T <: Data](bundleType: NetworkBundle[T]) extends Bundle {
   val int_in = Flipped(Decoupled(bundleType))
