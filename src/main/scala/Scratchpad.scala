@@ -1,6 +1,5 @@
 package testchipip
 
-import chisel3._
 
 import freechips.rocketchip.subsystem.{BaseSubsystem, MBUS}
 import freechips.rocketchip.config.{Field, Config}

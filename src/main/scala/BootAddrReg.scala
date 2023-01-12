@@ -1,16 +1,12 @@
 package testchipip
 
 import chisel3._
-import chisel3.experimental.{IO}
-import freechips.rocketchip.config.{Parameters, Field}
+import freechips.rocketchip.config.Field
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
-import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.regmapper._
 import freechips.rocketchip.subsystem._
-import freechips.rocketchip.util._
 import freechips.rocketchip.tile._
-import freechips.rocketchip.prci._
 
 
 case class BootAddrRegParams(

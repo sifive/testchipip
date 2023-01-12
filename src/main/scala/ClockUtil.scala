@@ -2,7 +2,6 @@ package testchipip
 
 import chisel3._
 import chisel3.util._
-import chisel3.experimental.{Analog, IntParam}
 
 import freechips.rocketchip.config.Parameters
 import freechips.rocketchip.util.{AsyncResetSynchronizerShiftReg, ClockGate, ClockGateImpl}

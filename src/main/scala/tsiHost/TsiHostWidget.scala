@@ -3,8 +3,8 @@ package testchipip
 import chisel3._
 import chisel3.util._
 
-import freechips.rocketchip.config.{Parameters, Field}
-import freechips.rocketchip.subsystem.{BaseSubsystem, MasterPortParams}
+import freechips.rocketchip.config.Parameters
+import freechips.rocketchip.subsystem.MasterPortParams
 import freechips.rocketchip.regmapper.{HasRegMap, RegFieldGroup}
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
@@ -14,7 +14,6 @@ import freechips.rocketchip.tile.{XLen}
 
 import sifive.blocks.util.{NonBlockingEnqueue, NonBlockingDequeue}
 
-import SerialAdapter._
 
 /**
  * Parameters for the SerDes

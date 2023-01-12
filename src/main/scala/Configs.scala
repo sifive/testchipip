@@ -1,6 +1,5 @@
 package testchipip
 
-import chisel3._
 import freechips.rocketchip.system.BaseConfig
 import freechips.rocketchip.config.{Parameters, Config}
 import freechips.rocketchip.tilelink._
