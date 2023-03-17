@@ -2,7 +2,7 @@ package testchipip
 
 import chisel3._
 import chisel3.experimental.IntParam
-import chisel3.util._
+import chisel3.util.{Cat, _}
 import freechips.rocketchip.config.{Field, Parameters}
 import freechips.rocketchip.subsystem.{CacheBlockBytes, BaseSubsystem, TLBusWrapperLocation, PBUS, FBUS}
 import freechips.rocketchip.diplomacy._
