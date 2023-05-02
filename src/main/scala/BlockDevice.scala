@@ -7,9 +7,10 @@ import freechips.rocketchip.config.{Field, Parameters}
 import freechips.rocketchip.subsystem.{CacheBlockBytes, BaseSubsystem, TLBusWrapperLocation, PBUS, FBUS}
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
+import freechips.rocketchip.interconnect.BusWrapper
 import freechips.rocketchip.regmapper.{RegisterReadIO, RegField, HasRegMap}
 import freechips.rocketchip.tilelink._
-import freechips.rocketchip.util.{ParameterizedBundle, DecoupledHelper}
+import freechips.rocketchip.util.{ParameterizedBundle, DecoupledHelper, Location}
 import freechips.rocketchip.prci.{ClockSinkDomain}
 import scala.math.max
 
@@ -19,7 +20,7 @@ case class BlockDeviceConfig(
 
 case class BlockDeviceAttachParams(
   slaveWhere: TLBusWrapperLocation = PBUS,
-  masterWhere: TLBusWrapperLocation = FBUS
+  masterWhere: Location[BusWrapper] = FBUS
 )
 
 case object BlockDeviceKey extends Field[Option[BlockDeviceConfig]](None)

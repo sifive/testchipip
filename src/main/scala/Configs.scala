@@ -2,10 +2,12 @@ package testchipip
 
 import freechips.rocketchip.system.BaseConfig
 import freechips.rocketchip.config.{Parameters, Config}
+import freechips.rocketchip.interconnect.BusWrapper
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.diplomacy.{AsynchronousCrossing, ClockCrossingType}
 import freechips.rocketchip.unittest.UnitTests
+import freechips.rocketchip.util.Location
 
 class WithRingSystemBus(
     buffer: TLNetworkBufferParams = TLNetworkBufferParams.default)
@@ -46,7 +48,7 @@ class WithBlockDevice(enable: Boolean = true) extends Config((site, here, up) =>
   }
 })
 
-class WithBlockDeviceLocations(slaveWhere: TLBusWrapperLocation = PBUS, masterWhere: TLBusWrapperLocation = FBUS) extends Config((site, here, up) => {
+class WithBlockDeviceLocations(slaveWhere: TLBusWrapperLocation = PBUS, masterWhere: Location[BusWrapper] = FBUS) extends Config((site, here, up) => {
   case BlockDeviceAttachKey => BlockDeviceAttachParams(slaveWhere, masterWhere)
 })
 

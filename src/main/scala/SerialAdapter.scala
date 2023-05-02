@@ -5,6 +5,7 @@ import chisel3.util.{Cat, _}
 import chisel3.experimental.DataMirror
 import freechips.rocketchip.config.{Parameters, Field}
 import freechips.rocketchip.ecc.HasImplicitErrorReportReducerNexusNode
+import freechips.rocketchip.interconnect.BusWrapper
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.tilelink._
@@ -338,7 +339,7 @@ case class SerialTLParams(
 case object SerialTLKey extends Field[Option[SerialTLParams]](None)
 
 case class SerialTLAttachParams(
-  masterWhere: TLBusWrapperLocation = FBUS,
+  masterWhere: Location[BusWrapper] = FBUS,
   slaveWhere: TLBusWrapperLocation = MBUS.asInstanceOf[Location[TLBusWrapper]],
   slaveCrossingType: ClockCrossingType = SynchronousCrossing()
 )

@@ -9,7 +9,7 @@ import freechips.rocketchip.prci.ClockSinkDomain
 trait CanHavePeripheryTLSerialControlOnly { this: BaseSubsystem =>
   private val portName = "serial-tl"
   val (desser, serial_tl) = p(SerialTLKey).map { params =>
-    val client = locateTLBusWrapper(p(SerialTLAttachKey).masterWhere) // The bus for which this acts as a client
+    val client = this.subscribe(p(SerialTLAttachKey).masterWhere) // The bus for which this acts as a client
     val clientParams = TLMasterPortParameters.v1(
       clients = Seq(TLMasterParameters.v2(
         name     = "serial-tl",
@@ -20,7 +20,7 @@ trait CanHavePeripheryTLSerialControlOnly { this: BaseSubsystem =>
 
     // Assume we are in the same domain as our client-side binding.
     val domain = LazyModule(new ClockSinkDomain(name=Some(portName)))
-    domain.clockNode := client.fixedClockNode
+    domain.clockNode := this.subsystemFixedClockNode
 
     val desser = domain { LazyModule(new TLDesser(
       w = params.width,
