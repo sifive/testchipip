@@ -459,7 +459,7 @@ trait CanHavePeripheryBlockDevice { this: BaseSubsystem =>
 
   val bdev = p(BlockDeviceKey).map { params =>
     val manager = locateTLBusWrapper(p(BlockDeviceAttachKey).slaveWhere) // The bus for which the controller acts as a manager
-    val client = locateTLBusWrapper(p(BlockDeviceAttachKey).masterWhere) // The bus for which the controller acts as a client
+    val client = this.subscribe(p(BlockDeviceAttachKey).masterWhere) // The bus for which the controller acts as a client
     val domain = LazyModule(new ClockSinkDomain(name=Some(portName)))
 
     // TODO: currently the controller is in the clock domain of the bus which masters it
@@ -471,7 +471,7 @@ trait CanHavePeripheryBlockDevice { this: BaseSubsystem =>
     }
 
     manager.toVariableWidthSlave(Some(portName)) { controller.mmio }
-    client.fromPort(Some(portName))() :=* controller.mem
+    client.coupleFrom(portName){ _ :=* TLFIFOFixer(TLFIFOFixer.all) :=* controller.mem}
     ibus.fromSync := controller.intnode
 
 
