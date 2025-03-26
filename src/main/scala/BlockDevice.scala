@@ -467,7 +467,7 @@ trait CanHavePeripheryBlockDevice { this: BaseSubsystem =>
     domain.clockNode := manager.fixedClockNode
 
     val controller = domain { LazyModule(new BlockDeviceController(
-      0x10015000, manager.beatBytes))
+      0x78015000, manager.beatBytes))
     }
 
     manager.toVariableWidthSlave(Some(portName)) { controller.mmio }

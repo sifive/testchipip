@@ -11,7 +11,7 @@ import freechips.rocketchip.tile._
 
 case class BootAddrRegParams(
   defaultBootAddress: BigInt = 0x80000000L, // This should be DRAM_BASE
-  bootRegAddress: BigInt = 0x4000,
+  bootRegAddress: BigInt = 0x78016000,
   slaveWhere: TLBusWrapperLocation = PBUS
 )
 case object BootAddrRegKey extends Field[BootAddrRegParams](BootAddrRegParams())
