@@ -4,7 +4,7 @@
 .section .text.start, "ax", @progbits
 .globl _start
 _start:
-  li a1, 0x2000000 // base address of clint
+  li a1, 0x7c000000 // base address of clint
   csrr a0, mhartid
   bnez a0, boot_core
   addi a2, a1, 4
